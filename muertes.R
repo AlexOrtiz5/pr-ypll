@@ -23,18 +23,17 @@ age_ends <- c(9, 14, 19, 29, 39, 64, 74, Inf)
 
 ##url <- "https://bioportal-apim.salud.pr.gov/bioportal/administration/reports/deaths/summary"
 file  <- "C:/Users/lualg/Downloads/CCOM3986/CovidPR/pr-ypll/dataset_defunciones.json"
+## Nuevo url salud
+url <- "https://covid19datos.salud.gov.pr/estadisticas_v2/download/data/defunciones/completo"
 
 ##portal_summary <- read_file(url)
-deaths <- jsonlite::fromJSON(file) %>%
-  as_tibble() %>%
+deaths <- read_csv(url) %>%
   mutate(date = as_date(ymd_hms(FE_MUERTE, tz = "America/Puerto_Rico"))) %>%
   mutate(date = if_else(date < first_day | date > today(),
     as_date(ymd_hms(FE_MUERTE, tz = "America/Puerto_Rico")),
     date)) %>%
   mutate(age_start = as.numeric(str_extract(TX_GRUPO_EDAD, "^\\d+")),
-  age_end = as.numeric(str_extract(TX_GRUPO_EDAD, "\\d+$"))) %>%
-  mutate(TX_GRUPO_EDAD = age_levels[as.numeric(cut(age_start, c(age_starts, Inf), right = FALSE))]) %>%
-  mutate(TX_GRUPO_EDAD = factor(TX_GRUPO_EDAD, levels = age_levels))
+  age_end = as.numeric(str_extract(TX_GRUPO_EDAD, "\\d+$")))
 
 # --Mortality and hospitlization
 # use old handmade database to fill in the blanks
